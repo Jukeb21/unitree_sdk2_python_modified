@@ -169,16 +169,38 @@ class Custom:
             self.low_cmd.motor_cmd[H1_2_JointIndex.RightAnkleRoll].kp = Kp_Roll
             self.low_cmd.motor_cmd[H1_2_JointIndex.RightAnkleRoll].kd = Kd_Roll
 
-            max_wrist_roll_angle = 0.5;  # [rad]
-            WristRoll_des = max_wrist_roll_angle * np.sin(2.0 * np.pi * t)
-            self.low_cmd.motor_cmd[H1_2_JointIndex.LeftWristRoll].q = WristRoll_des
-            self.low_cmd.motor_cmd[H1_2_JointIndex.LeftWristRoll].dq = 0
-            self.low_cmd.motor_cmd[H1_2_JointIndex.LeftWristRoll].kp = 50
-            self.low_cmd.motor_cmd[H1_2_JointIndex.LeftWristRoll].kd = 1
-            self.low_cmd.motor_cmd[H1_2_JointIndex.RightWristRoll].q = WristRoll_des
-            self.low_cmd.motor_cmd[H1_2_JointIndex.RightWristRoll].dq = 0
-            self.low_cmd.motor_cmd[H1_2_JointIndex.RightWristRoll].kp = 50
-            self.low_cmd.motor_cmd[H1_2_JointIndex.RightWristRoll].kd = 1
+            # max_wrist_roll_angle = 0.5;  # [rad]
+            # WristRoll_des = max_wrist_roll_angle * np.sin(2.0 * np.pi * t)
+            # self.low_cmd.motor_cmd[H1_2_JointIndex.LeftWristRoll].q = WristRoll_des
+            # self.low_cmd.motor_cmd[H1_2_JointIndex.LeftWristRoll].dq = 0
+            # self.low_cmd.motor_cmd[H1_2_JointIndex.LeftWristRoll].kp = 50
+            # self.low_cmd.motor_cmd[H1_2_JointIndex.LeftWristRoll].kd = 1
+            # self.low_cmd.motor_cmd[H1_2_JointIndex.RightWristRoll].q = WristRoll_des
+            # self.low_cmd.motor_cmd[H1_2_JointIndex.RightWristRoll].dq = 0
+            # self.low_cmd.motor_cmd[H1_2_JointIndex.RightWristRoll].kp = 50
+            # self.low_cmd.motor_cmd[H1_2_JointIndex.RightWristRoll].kd = 1
+
+
+            right_arm_target_angles = [a1, a2, a3, a4, a5, a6, a7]
+
+            ratio = np.clip((self.time_ - self.duration_) / self.duration_, 0.0, 1.0)
+
+            right_arm_indices = [
+                H1_2_JointIndex.RightShoulderPitch,
+                H1_2_JointIndex.RightShoulderRoll,
+                H1_2_JointIndex.RightShoulderYaw,
+                H1_2_JointIndex.RightElbow,
+                H1_2_JointIndex.RightWristRoll,
+                H1_2_JointIndex.RightWristPitch,
+                H1_2_JointIndex.RightWristYaw,
+            ]
+
+            for idx, target_q in zip(right_arm_indices, right_arm_target_angles):
+                current_q = self.low_state.motor_state[idx].q  # 当前角度
+                self.low_cmd.motor_cmd[idx].q = (1 - ratio) * current_q + ratio * target_q
+                self.low_cmd.motor_cmd[idx].dq = 0
+                self.low_cmd.motor_cmd[idx].kp = 50
+                self.low_cmd.motor_cmd[idx].kd = 1
 
         self.low_cmd.crc = self.crc.Crc(self.low_cmd)
         self.lowcmd_publisher_.Write(self.low_cmd)

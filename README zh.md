@@ -119,3 +119,9 @@ python3 ./example/obstacles_avoid_switch/obstacles_avoid_switch.py enp2s0
 python3 ./example/vui_client/vui_client_example.py enp2s0
 ```
 其中 `enp2s0` 为机器人所连接的网卡名称，请根据实际情况修改。机器人将循环调节音量和灯光亮度。该接口详细见 https://support.unitree.com/home/zh/developer/VuiClient
+
+## ip
+192.168.1.12(CMCCxia)
+
+## pass
+Unitree0408

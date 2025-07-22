@@ -13,7 +13,28 @@ from unitree_sdk2py.comm.motion_switcher.motion_switcher_client import MotionSwi
 
 import numpy as np
 
+import numpy as np
+from scipy.optimize import root
+
+A0 = 0.07106
+A1 = 0.275437
+A2 = 0.232857
+A3 = 0.054
+G = 0.2618
+Z = 0.0896
+Y = 0.2868
+X = 0.3346
+
 H1_2_NUM_MOTOR = 27
+
+def equations(vars):
+    x0, x1, x2 = vars
+    eq1 = (-A1 * np.cos(x0) + A2 * np.sin(x0 - x2)) * np.cos(G + x1) + A0 * np.sin(G) - Z
+    eq2 = (A1 * np.sin(x0) + A2 * np.cos(x0 - x2) + A3) - Y
+    eq3 = (A1 * np.cos(x0) - A2 * np.sin(x0 - x2)) * np.sin(G + x1) + A0 * np.cos(G) - X
+    return [eq1, eq2, eq3]
+
+
 
 class H1_2_JointIndex:
     # legs
@@ -137,37 +158,37 @@ class Custom:
                 self.low_cmd.motor_cmd[i].kd = 1.0
         else :
             # [Stage 2]: swing ankle using PR mode
-            max_P = 0.25
-            max_R = 0.25
-            t = self.time_ - self.duration_ 
-            L_P_des = max_P * np.cos(2.0 * np.pi * t)
-            L_R_des = max_R * np.sin(2.0 * np.pi * t)
-            R_P_des = max_P * np.cos(2.0 * np.pi * t)
-            R_R_des = -max_R * np.sin(2.0 * np.pi * t)
+            # max_P = 0.25
+            # max_R = 0.25
+            # t = self.time_ - self.duration_ 
+            # L_P_des = max_P * np.cos(2.0 * np.pi * t)
+            # L_R_des = max_R * np.sin(2.0 * np.pi * t)
+            # R_P_des = max_P * np.cos(2.0 * np.pi * t)
+            # R_R_des = -max_R * np.sin(2.0 * np.pi * t)
 
-            Kp_Pitch = 80
-            Kd_Pitch = 1
-            Kp_Roll = 80
-            Kd_Roll = 1
+            # Kp_Pitch = 80
+            # Kd_Pitch = 1
+            # Kp_Roll = 80
+            # Kd_Roll = 1
 
-            self.low_cmd.mode_pr = Mode.PR
-            self.low_cmd.mode_machine = self.mode_machine_
-            self.low_cmd.motor_cmd[H1_2_JointIndex.LeftAnklePitch].q = L_P_des
-            self.low_cmd.motor_cmd[H1_2_JointIndex.LeftAnklePitch].dq = 0
-            self.low_cmd.motor_cmd[H1_2_JointIndex.LeftAnklePitch].kp = Kp_Pitch
-            self.low_cmd.motor_cmd[H1_2_JointIndex.LeftAnklePitch].kd = Kd_Pitch
-            self.low_cmd.motor_cmd[H1_2_JointIndex.LeftAnkleRoll].q = L_R_des
-            self.low_cmd.motor_cmd[H1_2_JointIndex.LeftAnkleRoll].dq = 0
-            self.low_cmd.motor_cmd[H1_2_JointIndex.LeftAnkleRoll].kp = Kp_Roll
-            self.low_cmd.motor_cmd[H1_2_JointIndex.LeftAnkleRoll].kd = Kd_Roll
-            self.low_cmd.motor_cmd[H1_2_JointIndex.RightAnklePitch].q = R_P_des
-            self.low_cmd.motor_cmd[H1_2_JointIndex.RightAnklePitch].dq = 0
-            self.low_cmd.motor_cmd[H1_2_JointIndex.RightAnklePitch].kp = Kp_Pitch
-            self.low_cmd.motor_cmd[H1_2_JointIndex.RightAnklePitch].kd = Kd_Pitch
-            self.low_cmd.motor_cmd[H1_2_JointIndex.RightAnkleRoll].q = R_R_des
-            self.low_cmd.motor_cmd[H1_2_JointIndex.RightAnkleRoll].dq = 0
-            self.low_cmd.motor_cmd[H1_2_JointIndex.RightAnkleRoll].kp = Kp_Roll
-            self.low_cmd.motor_cmd[H1_2_JointIndex.RightAnkleRoll].kd = Kd_Roll
+            # self.low_cmd.mode_pr = Mode.PR
+            # self.low_cmd.mode_machine = self.mode_machine_
+            # self.low_cmd.motor_cmd[H1_2_JointIndex.LeftAnklePitch].q = L_P_des
+            # self.low_cmd.motor_cmd[H1_2_JointIndex.LeftAnklePitch].dq = 0
+            # self.low_cmd.motor_cmd[H1_2_JointIndex.LeftAnklePitch].kp = Kp_Pitch
+            # self.low_cmd.motor_cmd[H1_2_JointIndex.LeftAnklePitch].kd = Kd_Pitch
+            # self.low_cmd.motor_cmd[H1_2_JointIndex.LeftAnkleRoll].q = L_R_des
+            # self.low_cmd.motor_cmd[H1_2_JointIndex.LeftAnkleRoll].dq = 0
+            # self.low_cmd.motor_cmd[H1_2_JointIndex.LeftAnkleRoll].kp = Kp_Roll
+            # self.low_cmd.motor_cmd[H1_2_JointIndex.LeftAnkleRoll].kd = Kd_Roll
+            # self.low_cmd.motor_cmd[H1_2_JointIndex.RightAnklePitch].q = R_P_des
+            # self.low_cmd.motor_cmd[H1_2_JointIndex.RightAnklePitch].dq = 0
+            # self.low_cmd.motor_cmd[H1_2_JointIndex.RightAnklePitch].kp = Kp_Pitch
+            # self.low_cmd.motor_cmd[H1_2_JointIndex.RightAnklePitch].kd = Kd_Pitch
+            # self.low_cmd.motor_cmd[H1_2_JointIndex.RightAnkleRoll].q = R_R_des
+            # self.low_cmd.motor_cmd[H1_2_JointIndex.RightAnkleRoll].dq = 0
+            # self.low_cmd.motor_cmd[H1_2_JointIndex.RightAnkleRoll].kp = Kp_Roll
+            # self.low_cmd.motor_cmd[H1_2_JointIndex.RightAnkleRoll].kd = Kd_Roll
 
             # max_wrist_roll_angle = 0.5;  # [rad]
             # WristRoll_des = max_wrist_roll_angle * np.sin(2.0 * np.pi * t)
@@ -180,8 +201,21 @@ class Custom:
             # self.low_cmd.motor_cmd[H1_2_JointIndex.RightWristRoll].kp = 50
             # self.low_cmd.motor_cmd[H1_2_JointIndex.RightWristRoll].kd = 1
 
+            # 初始猜测值
+            initial_guess = [0.5, 0.5, 0.5]
+            solution = root(equations, initial_guess)
+            if solution.success:
+                x0_num, x1_num, x2_num = solution.x
+                j3_num = x0_num - x2_num
+                if -3.14 <= x0_num <= 1.57 and -0.38 <= x1_num <= 3.4 and -0.471 <= x2_num <= 0.349 and -1.012 <= j3_num <= 1.012:
+                    print(f"解为: x0 = {x0_num}, x1 = {x1_num}, x2 = {x2_num}, x3 = {j3_num}")
+                else:
+                    print("超过关节限制")
+            else:
+                print("方程组无解")
 
-            right_arm_target_angles = [a1, a2, a3, a4, a5, a6, a7]
+
+            right_arm_target_angles = [x0_num, x1_num, 0, x2_num, 0, 0, j3_num]
 
             ratio = np.clip((self.time_ - self.duration_) / self.duration_, 0.0, 1.0)
 
@@ -194,7 +228,15 @@ class Custom:
                 H1_2_JointIndex.RightWristPitch,
                 H1_2_JointIndex.RightWristYaw,
             ]
-
+            # 设置右臂关节角度
+            self.low_cmd.mode_pr = Mode.AB
+            self.low_cmd.mode_machine = self.mode_machine_
+            self.low_cmd.motor_cmd[H1_2_JointIndex.RightHipYaw].mode = 1  # Enable
+            self.low_cmd.motor_cmd[H1_2_JointIndex.RightHipPitch].mode = 1  # Enable
+            self.low_cmd.motor_cmd[H1_2_JointIndex.RightHipRoll].mode = 1  # Enable
+            self.low_cmd.motor_cmd[H1_2_JointIndex.RightKnee].mode = 1  # Enable
+            self.low_cmd.motor_cmd[H1_2_JointIndex.RightAnklePitch].mode = 1  # Enable
+            self.low_cmd.motor_cmd[H1_2_JointIndex.RightAnkleRoll].mode = 1  # Enable
             for idx, target_q in zip(right_arm_indices, right_arm_target_angles):
                 current_q = self.low_state.motor_state[idx].q  # 当前角度
                 self.low_cmd.motor_cmd[idx].q = (1 - ratio) * current_q + ratio * target_q

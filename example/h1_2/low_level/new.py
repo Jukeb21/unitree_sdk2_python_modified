@@ -254,8 +254,8 @@ class Custom:
                 print("无法计算目标角度，跳过插值操作")
                 # 可选：重置 lowcmd 或设置默认值
                 # self.lowcmd = DefaultLowCmd()
-                self.lowcmd.crc = self.crc.Crc(self.lowcmd)
-                self.lowcmdpublisher.Write(self.lowcmd)
+                self.low_cmd.crc = self.crc.Crc(self.lowcmd)
+                self.lowcmd_publisher_.Write(self.lowcmd)
             else:
 
                 # 计算当前时间在总时间中的比例
@@ -273,25 +273,25 @@ class Custom:
 
                 # 执行插值
                 right_arm_indices = [
-                    H12JointIndex.RightShoulderPitch,
-                    H12JointIndex.RightShoulderRoll,
-                    H12JointIndex.RightShoulderYaw,
-                    H12JointIndex.RightElbow,
-                    H12JointIndex.RightWristRoll,
-                    H12JointIndex.RightWristPitch,
-                    H12JointIndex.RightWristYaw,
+                    H1_2_JointIndex.RightShoulderPitch,
+                    H1_2_JointIndex.RightShoulderRoll,
+                    H1_2_JointIndex.RightShoulderYaw,
+                    H1_2_JointIndex.RightElbow,
+                    H1_2_JointIndex.RightWristRoll,
+                    H1_2_JointIndex.RightWristPitch,
+                    H1_2_JointIndex.RightWristYaw,
                 ]
 
                 for idx, target_q in zip(right_arm_indices, current_target):
-                    current_q = self.lowstate.motorstate[idx].q  # 当前角度
-                    self.lowcmd.motorcmd[idx].q = (1 - stage_ratio) * current_q + stage_ratio * target_q
-                    self.lowcmd.motorcmd[idx].dq = 0
-                    self.lowcmd.motorcmd[idx].kp = 50
-                    self.lowcmd.motorcmd[idx].kd = 1
+                    current_q = self.low_state.motor_state[idx].q  # 当前角度
+                    self.low_cmd.motor_cmd[idx].q = (1 - stage_ratio) * current_q + stage_ratio * target_q
+                    self.low_cmd.motor_cmd[idx].dq = 0
+                    self.low_cmd.motor_cmd[idx].kp = 50
+                    self.low_cmd.motor_cmd[idx].kd = 1
 
                 # 发布控制命令
-                self.lowcmd.crc = self.crc.Crc(self.lowcmd)
-                self.lowcmdpublisher.Write(self.lowcmd)
+                self.low_cmd.crc = self.crc.Crc(self.lowcmd)
+                self.lowcmd_publisher_.Write(self.lowcmd)
 
 if __name__ == '__main__':
 
